@@ -1,0 +1,114 @@
+create database ecommerce;
+use ecommerce;
+drop table ecommerce;
+drop database ecommerce;
+-- users table
+
+create table users(
+user_id int primary key auto_increment,
+user_name varchar(50),
+email_id varchar(60) unique,
+sign_date date
+);
+insert into users(user_id,user_name,email_id,sign_date)
+values(1,'kavya','kavya@gmail.com','2025-01-13'),
+(2,'priya','priya@gmail.com','2025-01-15'),
+(3,'Dhnaush','dhanush@gmail.com','2025-02-14'),
+(4,'swetha','swetha@gmail.com','2025-02-18'),
+(5,'Deva','deva@gmail.com','2025-02-20');
+select *from users;
+drop table users;
+
+ -- products table
+ 
+create table products(
+product_id int primary key auto_increment,
+product_name varchar(50),
+price decimal (10,2),
+stock_quality int
+);
+insert into products(product_id,product_name,price,stock_quality)
+values(1,'watch',400,10),
+(2,'wallet',500,15),
+(3,'Elegant handbags',600,10),
+(4,'headphones',250,23),
+(5,'bluetooth',500,10);
+select *from products;
+
+-- orders table
+
+create table orders(
+order_id int primary key auto_increment,
+user_id int,
+order_date date,
+total_amount decimal(10,2),
+foreign key (user_id) references users(user_id)
+);
+insert into orders(user_id,order_date,total_amount)
+values(1,'2025-01-13',400),
+(2,'2025-01-15',500),
+(3,'2025-02-14',600),
+(4,'2025-02-18',250),
+(5,'2025-02-20',500);
+select *from orders;
+select *from users;
+
+-- orders payments
+
+create table payments(
+payments_id int primary key auto_increment,
+order_id int,
+payment_date date,
+total_amount decimal(10,2),
+foreign key (order_id) references orders(order_id)
+);
+insert into payments (order_id,payment_date,total_amount)
+values(1,'2025-01-13',400),
+(2,'2025-01-15',500),
+(3,'2025-02-14',600),
+(4,'2025-02-18',250),
+(5,'2025-02-20',500);
+select *from payments;
+
+-- table reviews
+
+create table reviews(
+review_id int primary key auto_increment,
+user_id int,
+product_id int,
+rating int check (rating BETWEEN 1 AND 5),
+review_text text,
+foreign key (user_id) references users(user_id) ON DELETE  CASCADE,
+foreign key (product_id) references products(product_id) ON DELETE  CASCADE
+);
+insert into reviews(user_id,product_id,rating,review_text)
+values(1, 1, 5, 'Excellent product!'),
+(2, 2, 4, 'Good quality but expensive.'),
+(3, 3, 5, 'Very comfortable and good sound.'),
+(4,4,5,'Good product.'),
+(5,5,2,'product delivery late.');
+select *from reviews;
+
+-- get top-selling products!
+
+SELECT 
+    p.product_id, 
+    p.product_name, 
+    COUNT(o.order_id) AS total_orders
+FROM Orders o
+JOIN Products p ON o.total_amount = p.price
+GROUP BY p.product_id, p.product_name
+ORDER BY total_orders DESC
+LIMIT 5;
+
+-- total-amount check this!
+select sum(total_amount) from payments;
+
+-- total-customer-check-this!
+select count(*) from users;
+
+-- total-max-values-check this!
+select max(total_amount)  from payments;
+
+-- two tables combine the particuler column
+select users.user_name,products.product_name from users inner join products on users.user_id=products.product_id;
